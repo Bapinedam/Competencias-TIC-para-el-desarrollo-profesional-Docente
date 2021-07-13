@@ -6,11 +6,12 @@ output: github_document
 
 # Librerias
 
-```{r}
+```{r message=FALSE}
 library(dplyr)
 library(googlesheets4)
 library(ggplot2)
 library(scales)
+library(tidyverse)
 ```
 
 # Datos
@@ -74,13 +75,29 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
 ## Nivel educativo en el que enseña
 
 ```{r}
-data_nivel_educativo = data %>% select(`Nivel educativo en el que labora`) %>%
-  group_by(`Nivel educativo en el que labora`) %>% tally()
+data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
 
-data_nivel_educativo$Porcentaje = data_nivel_educativo$n / sum(data_nivel_educativo$n)
+data_nivel_educativo2 = data_nivel_educativo %>% select(`Número de identificación`, `Nivel 1`, `Nivel 2`, `Nivel 3`,`Nivel 4`) %>%
+  pivot_longer(c(`Nivel 1`, `Nivel 2`, `Nivel 3`,`Nivel 4`), names_to = "Nivel educativo en el que labora")
 
-data_nivel_educativo %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
-  mutate(name=factor(`Nivel educativo en el que labora`, levels=`Nivel educativo en el que labora`)) %>%   # This trick update the factor levels
+data_nivel_educativo2$value <- chartr("áéíóú", "aeiou", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- str_to_upper(data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("_", " ", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("  ", " ", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub(" $", "", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("^ ", "", data_nivel_educativo2$value)
+
+
+data_nivel_educativo3 = data_nivel_educativo2 %>% group_by(`value`) %>% 
+  tally()
+
+data_nivel_educativo3 = data_nivel_educativo3[complete.cases(data_nivel_educativo3[,1]), ]
+
+data_nivel_educativo3$Porcentaje = data_nivel_educativo3$n / sum(data_nivel_educativo3$n)
+
+
+data_nivel_educativo3 %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+  mutate(name=factor(value, levels=value)) %>%   # This trick update the factor levels
   ggplot(aes(x=name, y=Porcentaje)) +
   scale_y_continuous(labels = percent_format()) +
   geom_segment(aes(xend=name, yend=0)) +

@@ -2,6 +2,7 @@ library(dplyr)
 library(googlesheets4)
 library(ggplot2)
 library(scales)
+library(tidyverse)
 
 # Autenticación de usuario
 
@@ -50,3 +51,69 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
   theme_bw()
   
 
+  ## Nivel educativo en el que enseña
+
+data_nivel_educativo = data %>% select(`Nivel educativo en el que labora`) %>%
+  group_by(`Nivel educativo en el que labora`) %>% tally()
+
+data_nivel_educativo$Porcentaje = data_nivel_educativo$n / sum(data_nivel_educativo$n)
+
+data_nivel_educativo %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+  mutate(name=factor(`Nivel educativo en el que labora`, levels=`Nivel educativo en el que labora`)) %>%   # This trick update the factor levels
+  ggplot(aes(x=name, y=Porcentaje)) +
+  scale_y_continuous(labels = percent_format()) +
+  geom_segment(aes(xend=name, yend=0)) +
+  geom_point( size=4, color="orange") +
+  coord_flip() +
+  theme_bw() +
+  xlab("")
+
+  ### Debido a que los datos están mezclados, la idea es separar dicha información
+
+data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
+
+data_nivel_educativo2 = data_nivel_educativo %>% select(`Número de identificación`, `Nivel 1`, `Nivel 2`, `Nivel 3`,`Nivel 4`) %>%
+  pivot_longer(c(`Nivel 1`, `Nivel 2`, `Nivel 3`,`Nivel 4`), names_to = "Nivel educativo en el que labora")
+
+data_nivel_educativo2$value <- chartr("áéíóú", "aeiou", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- str_to_upper(data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("_", " ", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("  ", " ", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub(" $", "", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("^ ", "", data_nivel_educativo2$value)
+
+
+data_nivel_educativo3 = data_nivel_educativo2 %>% group_by(`value`) %>% 
+  tally()
+
+data_nivel_educativo3 = data_nivel_educativo3[complete.cases(data_nivel_educativo3[,1]), ]
+
+data_nivel_educativo3$Porcentaje = data_nivel_educativo3$n / sum(data_nivel_educativo3$n)
+
+
+data_nivel_educativo3 %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+  mutate(name=factor(value, levels=value)) %>%   # This trick update the factor levels
+  ggplot(aes(x=name, y=Porcentaje)) +
+  scale_y_continuous(labels = percent_format()) +
+  geom_segment(aes(xend=name, yend=0)) +
+  geom_point( size=4, color="orange") +
+  coord_flip() +
+  theme_bw() +
+  xlab("")
+
+  ## Nivel educativo del docente
+
+data_educacion_docente = data %>% select(`Número de identificación`, 
+                                         `¿Cuál es su máximo nivel educativo? [Bachiller]`,
+                                         `¿Cuál es su máximo nivel educativo? [Normalista superior]`,
+                                         `¿Cuál es su máximo nivel educativo? [Técnico o tecnólogo]`,
+                                         `¿Cuál es su máximo nivel educativo? [Profesional universitario]`,
+                                         `¿Cuál es su máximo nivel educativo? [Especialización]`,
+                                         `¿Cuál es su máximo nivel educativo? [Maestría]`,
+                                         `¿Cuál es su máximo nivel educativo? [Doctorado]`) %>%
+  pivot_longer(cols = 2:8, names_to = "Aprobación")
+
+data_educacion_docente = data_educacion_docente[complete.cases(data_educacion_docente[, "value"]), ]
+data_educacion_docente = data_educacion_docente["values" != ]
+
+unique(data_educacion_docente$value)
