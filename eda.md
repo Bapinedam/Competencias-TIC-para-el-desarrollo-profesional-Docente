@@ -6,23 +6,10 @@ Brayam Pineda
 
 ``` r
 library(dplyr)
-```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-``` r
 library(googlesheets4)
 library(ggplot2)
 library(scales)
+library(tidyverse)
 ```
 
 # Datos
@@ -41,7 +28,7 @@ table(data$Sexo)
 
     ## 
     ##            Femenino           Masculino Prefiero no decirlo 
-    ##                  30                  18                   2
+    ##                  31                  18                   2
 
 ``` r
 data_sexo = data %>% select(Sexo) %>% group_by(Sexo) %>% tally()
@@ -79,20 +66,41 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
   theme_bw()
 ```
 
-    ## Warning: Removed 6 rows containing non-finite values (stat_boxplot).
+    ## Warning: Removed 7 rows containing non-finite values (stat_boxplot).
 
 ![](eda_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ## Nivel educativo en el que enseña
 
 ``` r
-data_nivel_educativo = data %>% select(`Nivel educativo en el que labora`) %>%
-  group_by(`Nivel educativo en el que labora`) %>% tally()
+data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
+```
 
-data_nivel_educativo$Porcentaje = data_nivel_educativo$n / sum(data_nivel_educativo$n)
+    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 50 rows [1, 2, 3,
+    ## 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
-data_nivel_educativo %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
-  mutate(name=factor(`Nivel educativo en el que labora`, levels=`Nivel educativo en el que labora`)) %>%   # This trick update the factor levels
+``` r
+data_nivel_educativo2 = data_nivel_educativo %>% select(`Número de identificación`, `Nivel 1`, `Nivel 2`, `Nivel 3`,`Nivel 4`) %>%
+  pivot_longer(c(`Nivel 1`, `Nivel 2`, `Nivel 3`,`Nivel 4`), names_to = "Nivel educativo en el que labora")
+
+data_nivel_educativo2$value <- chartr("áéíóú", "aeiou", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- str_to_upper(data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("_", " ", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("  ", " ", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub(" $", "", data_nivel_educativo2$value)
+data_nivel_educativo2$value <- gsub("^ ", "", data_nivel_educativo2$value)
+
+
+data_nivel_educativo3 = data_nivel_educativo2 %>% group_by(`value`) %>% 
+  tally()
+
+data_nivel_educativo3 = data_nivel_educativo3[complete.cases(data_nivel_educativo3[,1]), ]
+
+data_nivel_educativo3$Porcentaje = data_nivel_educativo3$n / sum(data_nivel_educativo3$n)
+
+
+data_nivel_educativo3 %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+  mutate(name=factor(value, levels=value)) %>%   # This trick update the factor levels
   ggplot(aes(x=name, y=Porcentaje)) +
   scale_y_continuous(labels = percent_format()) +
   geom_segment(aes(xend=name, yend=0)) +
