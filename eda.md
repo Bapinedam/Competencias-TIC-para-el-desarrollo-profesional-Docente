@@ -28,10 +28,15 @@ table(data$Sexo)
 
     ## 
     ##            Femenino           Masculino Prefiero no decirlo 
-    ##                  31                  18                   2
+    ##                  38                  16                   2
 
 ``` r
 data_sexo = data %>% select(Sexo) %>% group_by(Sexo) %>% tally()
+```
+
+    ## Adding missing grouping variables: `Número de identificación`
+
+``` r
 data_sexo$Porcentaje = data_sexo$n / sum(data_sexo$n) 
 
 ggplot(data = data_sexo, aes(x = Sexo, y = Porcentaje)) + 
@@ -60,7 +65,11 @@ hist(data$`Edad (en años)`, breaks=40, col=rgb(0.2,0.8,0.5,0.5) , border=F , ma
 
 ``` r
 data_edad_sexo = data %>% select(Sexo, `Edad (en años)`) %>% filter(Sexo != "Prefiero no decirlo")
+```
 
+    ## Adding missing grouping variables: `Número de identificación`
+
+``` r
 ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo)) +
   geom_boxplot(alpha=0.7, width=.4) + 
   theme_bw()
@@ -76,7 +85,9 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
 data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
 ```
 
-    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 50 rows [1, 2, 3,
+    ## Warning: Expected 4 pieces. Additional pieces discarded in 1 rows [52].
+
+    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 54 rows [1, 2, 3,
     ## 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
@@ -111,3 +122,55 @@ data_nivel_educativo3 %>% arrange(Porcentaje) %>%    # First sort by val. This s
 ```
 
 ![](eda_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+## Máximo nivel educativo alcanzado por los docentes
+
+``` r
+data_educacion_docente = data %>% select(`Número de identificación`, 
+                                         `¿Cuál es su máximo nivel educativo? [Bachiller]`,
+                                         `¿Cuál es su máximo nivel educativo? [Normalista superior]`,
+                                         `¿Cuál es su máximo nivel educativo? [Técnico o tecnólogo]`,
+                                         `¿Cuál es su máximo nivel educativo? [Profesional universitario]`,
+                                         `¿Cuál es su máximo nivel educativo? [Especialización]`,
+                                         `¿Cuál es su máximo nivel educativo? [Maestría]`,
+                                         `¿Cuál es su máximo nivel educativo? [Doctorado]`) %>%
+  pivot_longer(cols = 2:8, names_to = "Aprobación")
+
+data_educacion_docente = data_educacion_docente[complete.cases(data_educacion_docente[, "value"]), ]
+data_educacion_docente = data_educacion_docente[data_educacion_docente$value == "Aprobado", ]
+
+data_educacion_docente$Aprobación = gsub("^¿Cuál es su máximo nivel educativo? *", "", data_educacion_docente$Aprobación)
+data_educacion_docente$Aprobación = gsub("^[?[]", "", data_educacion_docente$Aprobación)
+data_educacion_docente$Aprobación = gsub("\\[", "", data_educacion_docente$Aprobación)
+data_educacion_docente$Aprobación = gsub("\\]", "", data_educacion_docente$Aprobación)
+data_educacion_docente$Aprobación = gsub("^ ", "", data_educacion_docente$Aprobación)
+
+
+
+data_educacion_docente = data_educacion_docente[order(data_educacion_docente$`Número de identificación`, data_educacion_docente$Aprobación), ]
+
+data_educacion_docente$Nivel = data_educacion_docente$Aprobación
+
+data_educacion_docente$Nivel = stringr::str_replace_all(pattern = c("Bachiller" = "1", 
+                                                                    "Normalista superior" = "2", 
+                                                                    "Técnico o tecnólogo" = "3", 
+                                                                    "Profesional universitario" = "4", 
+                                                                    "Especialización" = "5", 
+                                                                    "Maestría" = "6"), data_educacion_docente$Nivel)
+
+data_educacion_docente = data_educacion_docente %>% group_by(`Número de identificación`) %>%
+  top_n(1, Nivel)
+
+data_educacion_docente = data_educacion_docente %>% group_by(`Aprobación`) %>% tally()
+data_educacion_docente$Porcentaje = data_educacion_docente$n / sum(data_educacion_docente$n)
+
+ggplot(data = data_educacion_docente, aes(x = "", y = Porcentaje, fill = `Aprobación`)) +
+  geom_bar(stat = "identity", width = 1) +
+  scale_y_continuous(labels = percent_format()) +
+  coord_polar("y", start = 0) +
+  theme_void() + 
+  
+  geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->

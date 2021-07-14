@@ -14,6 +14,8 @@ url = gs4_get("https://docs.google.com/spreadsheets/d/1ktKLnH8EcjV6fIBfQsfD6PZa7
 data = read_sheet(url)
 
 data$`Edad (en años)` = as.numeric(data$`Edad (en años)`)
+data = data %>% group_by(`Número de identificación`) %>% top_n(1, `Marca temporal`)
+
 
 # Análisis exploratorio de datos
 
@@ -114,6 +116,40 @@ data_educacion_docente = data %>% select(`Número de identificación`,
   pivot_longer(cols = 2:8, names_to = "Aprobación")
 
 data_educacion_docente = data_educacion_docente[complete.cases(data_educacion_docente[, "value"]), ]
-data_educacion_docente = data_educacion_docente["values" != ]
+data_educacion_docente = data_educacion_docente[data_educacion_docente$value == "Aprobado", ]
 
-unique(data_educacion_docente$value)
+data_educacion_docente$Aprobación = gsub("^¿Cuál es su máximo nivel educativo? *", "", data_educacion_docente$Aprobación)
+data_educacion_docente$Aprobación = gsub("^[?[]", "", data_educacion_docente$Aprobación)
+data_educacion_docente$Aprobación = gsub("\\[", "", data_educacion_docente$Aprobación)
+data_educacion_docente$Aprobación = gsub("\\]", "", data_educacion_docente$Aprobación)
+data_educacion_docente$Aprobación = gsub("^ ", "", data_educacion_docente$Aprobación)
+
+
+
+data_educacion_docente = data_educacion_docente[order(data_educacion_docente$`Número de identificación`, data_educacion_docente$Aprobación), ]
+
+data_educacion_docente$Nivel = data_educacion_docente$Aprobación
+
+data_educacion_docente$Nivel = stringr::str_replace_all(pattern = c("Bachiller" = "1", 
+                                                                    "Normalista superior" = "2", 
+                                                                    "Técnico o tecnólogo" = "3", 
+                                                                    "Profesional universitario" = "4", 
+                                                                    "Especialización" = "5", 
+                                                                    "Maestría" = "6"), data_educacion_docente$Nivel)
+
+data_educacion_docente = data_educacion_docente %>% group_by(`Número de identificación`) %>%
+  top_n(1, Nivel)
+
+data_educacion_docente = data_educacion_docente %>% group_by(`Aprobación`) %>% tally()
+data_educacion_docente$Porcentaje = data_educacion_docente$n / sum(data_educacion_docente$n)
+
+ggplot(data = data_educacion_docente, aes(x = "", y = Porcentaje, fill = `Aprobación`)) +
+  geom_bar(stat = "identity", width = 1) +
+  scale_y_continuous(labels = percent_format()) +
+  coord_polar("y", start = 0) +
+  theme_void() + 
+  
+  geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
+  
+
+
