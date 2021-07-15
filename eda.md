@@ -28,7 +28,7 @@ table(data$Sexo)
 
     ## 
     ##            Femenino           Masculino Prefiero no decirlo 
-    ##                  38                  16                   2
+    ##                  50                  25                   2
 
 ``` r
 data_sexo = data %>% select(Sexo) %>% group_by(Sexo) %>% tally()
@@ -75,7 +75,7 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
   theme_bw()
 ```
 
-    ## Warning: Removed 7 rows containing non-finite values (stat_boxplot).
+    ## Warning: Removed 9 rows containing non-finite values (stat_boxplot).
 
 ![](eda_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
@@ -85,9 +85,9 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
 data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
 ```
 
-    ## Warning: Expected 4 pieces. Additional pieces discarded in 1 rows [52].
+    ## Warning: Expected 4 pieces. Additional pieces discarded in 1 rows [51].
 
-    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 54 rows [1, 2, 3,
+    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 74 rows [1, 2, 3,
     ## 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
@@ -174,3 +174,81 @@ ggplot(data = data_educacion_docente, aes(x = "", y = Porcentaje, fill = `Aproba
 ```
 
 ![](eda_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+## Estatuto docente
+
+``` r
+data_estatuto = data %>% select(`¿En qué estatuto docente se encuentra actualmente?`) %>% group_by(`¿En qué estatuto docente se encuentra actualmente?`) %>% tally()
+```
+
+    ## Adding missing grouping variables: `Número de identificación`
+
+``` r
+data_estatuto$Porcentaje = data_estatuto$n / sum(data_estatuto$n) 
+
+ggplot(data = data_estatuto, aes(x = `¿En qué estatuto docente se encuentra actualmente?`, y = Porcentaje)) + 
+  geom_bar(stat = "identity", fill="dodgerblue", alpha=.6, width=.4) +
+  scale_y_continuous(labels = percent_format()) +
+  ylab("") +
+  theme_bw()
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+## Departamento de origen
+
+``` r
+data_departamento = data %>% select(`Número de identificación`, Departamento)
+
+data_departamento$Departamento <- chartr("áéíóú", "aeiou", data_departamento$Departamento)
+data_departamento$Departamento <- str_to_upper(data_departamento$Departamento)
+data_departamento$Departamento <- gsub("_", " ", data_departamento$Departamento)
+data_departamento$Departamento <- gsub("  ", " ", data_departamento$Departamento)
+data_departamento$Departamento <- gsub(" $", "", data_departamento$Departamento)
+data_departamento$Departamento <- gsub("^ ", "", data_departamento$Departamento)
+data_departamento$Departamento <- chartr("ÁÉÍÓÚ", "AEIOU", data_departamento$Departamento)
+data_departamento$Departamento <- chartr("À", "A", data_departamento$Departamento)
+data_departamento$Departamento <- gsub("VALLE$", "VALLE DEL CAUCA", data_departamento$Departamento)
+
+data_departamento2 = data_departamento %>% group_by(`Departamento`) %>% 
+  tally()
+
+data_departamento2 = data_departamento2[complete.cases(data_departamento2[,1]), ]
+
+data_departamento2$Porcentaje = data_departamento2$n / sum(data_departamento2$n)
+
+
+data_departamento2 %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+  mutate(name=factor(Departamento, levels=Departamento)) %>%   # This trick update the factor levels
+  ggplot(aes(x=name, y=Porcentaje)) +
+  scale_y_continuous(labels = percent_format()) +
+  geom_segment(aes(xend=name, yend=0)) +
+  geom_point( size=4, color="indianred1") +
+  coord_flip() +
+  theme_bw() +
+  xlab("")
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+## Rol dentro de la institución
+
+``` r
+data_rol = data %>% select(`Número de identificación`, `Rol en su comunidad educativa`)
+
+data_rol$`Rol en su comunidad educativa` = gsub("Docente Tutor PTA", "Tutor PTA", data_rol$`Rol en su comunidad educativa`)
+
+data_rol = data_rol %>% group_by(`Rol en su comunidad educativa`) %>% tally()
+
+data_rol$Porcentaje = data_rol$n / sum(data_rol$n)
+
+data_rol %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+  mutate(name=factor(`Rol en su comunidad educativa`, levels=`Rol en su comunidad educativa`)) %>%   # This trick update the factor levels
+  ggplot(aes(x=name, y=Porcentaje)) +
+  geom_bar(stat = "identity", fill="lightpink2", alpha=.6, width=.4) +
+  scale_y_continuous(labels = percent_format()) +
+  ylab("") +
+  theme_bw()
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->

@@ -158,3 +158,70 @@ ggplot(data = data_educacion_docente, aes(x = "", y = Porcentaje, fill = `Aproba
   geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
 ```
 
+## Estatuto docente
+
+```{r}
+data_estatuto = data %>% select(`¿En qué estatuto docente se encuentra actualmente?`) %>% group_by(`¿En qué estatuto docente se encuentra actualmente?`) %>% tally()
+data_estatuto$Porcentaje = data_estatuto$n / sum(data_estatuto$n) 
+
+ggplot(data = data_estatuto, aes(x = `¿En qué estatuto docente se encuentra actualmente?`, y = Porcentaje)) + 
+  geom_bar(stat = "identity", fill="dodgerblue", alpha=.6, width=.4) +
+  scale_y_continuous(labels = percent_format()) +
+  ylab("") +
+  theme_bw()
+```
+
+## Departamento de origen
+
+```{r}
+data_departamento = data %>% select(`Número de identificación`, Departamento)
+
+data_departamento$Departamento <- chartr("áéíóú", "aeiou", data_departamento$Departamento)
+data_departamento$Departamento <- str_to_upper(data_departamento$Departamento)
+data_departamento$Departamento <- gsub("_", " ", data_departamento$Departamento)
+data_departamento$Departamento <- gsub("  ", " ", data_departamento$Departamento)
+data_departamento$Departamento <- gsub(" $", "", data_departamento$Departamento)
+data_departamento$Departamento <- gsub("^ ", "", data_departamento$Departamento)
+data_departamento$Departamento <- chartr("ÁÉÍÓÚ", "AEIOU", data_departamento$Departamento)
+data_departamento$Departamento <- chartr("À", "A", data_departamento$Departamento)
+data_departamento$Departamento <- gsub("VALLE$", "VALLE DEL CAUCA", data_departamento$Departamento)
+
+data_departamento2 = data_departamento %>% group_by(`Departamento`) %>% 
+  tally()
+
+data_departamento2 = data_departamento2[complete.cases(data_departamento2[,1]), ]
+
+data_departamento2$Porcentaje = data_departamento2$n / sum(data_departamento2$n)
+
+
+data_departamento2 %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+  mutate(name=factor(Departamento, levels=Departamento)) %>%   # This trick update the factor levels
+  ggplot(aes(x=name, y=Porcentaje)) +
+  scale_y_continuous(labels = percent_format()) +
+  geom_segment(aes(xend=name, yend=0)) +
+  geom_point( size=4, color="indianred1") +
+  coord_flip() +
+  theme_bw() +
+  xlab("")
+```
+
+## Rol dentro de la institución
+
+```{r}
+data_rol = data %>% select(`Número de identificación`, `Rol en su comunidad educativa`)
+
+data_rol$`Rol en su comunidad educativa` = gsub("Docente Tutor PTA", "Tutor PTA", data_rol$`Rol en su comunidad educativa`)
+
+data_rol = data_rol %>% group_by(`Rol en su comunidad educativa`) %>% tally()
+
+data_rol$Porcentaje = data_rol$n / sum(data_rol$n)
+
+data_rol %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataframe but NOT the factor levels
+  mutate(name=factor(`Rol en su comunidad educativa`, levels=`Rol en su comunidad educativa`)) %>%   # This trick update the factor levels
+  ggplot(aes(x=name, y=Porcentaje)) +
+  geom_bar(stat = "identity", fill="lightpink2", alpha=.6, width=.4) +
+  scale_y_continuous(labels = percent_format()) +
+  ylab("") +
+  theme_bw()
+```
+
