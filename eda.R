@@ -197,8 +197,6 @@ data_departamento2 %>% arrange(Porcentaje) %>%    # First sort by val. This sort
 
   ## Rol 
 
-## Estatuto docente
-
 data_rol = data %>% select(`Número de identificación`, `Rol en su comunidad educativa`)
 
 data_rol$`Rol en su comunidad educativa` = gsub("Docente Tutor PTA", "Tutor PTA", data_rol$`Rol en su comunidad educativa`)
@@ -215,4 +213,69 @@ data_rol %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataf
   ylab("") +
   theme_bw()
 
-  ## 
+  ## Asignaturas que dicta
+
+unique(data$`Área de trabajo para la construcción del RED u OVA`)
+
+data_asignatura = data %>% group_by(`Área de trabajo para la construcción del RED u OVA`) %>% tally()
+data_asignatura$Porcentaje = data_asignatura$n / sum(data_asignatura$n)
+
+ggplot(data = data_asignatura, aes(x = "", y = Porcentaje, fill = `Área de trabajo para la construcción del RED u OVA`)) +
+  geom_bar(stat = "identity", width = 1) +
+  scale_y_continuous(labels = percent_format()) +
+  coord_polar("y", start = 0) +
+  theme_void() + 
+  
+  geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
+
+############### CALIFICACIÓN ############
+
+  ## Exploración de las variables
+
+summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
+
+  ### Quitando ourliers
+
+replaceOutliers = function(x) {
+  q1 = quantile(x, na.rm = TRUE, 0.25)
+  q3 = quantile(x, na.rm = TRUE, 0.75)
+  x[x < q1] = median(x, na.rm = TRUE)
+  x[x > q3] = median(x, na.rm = TRUE)
+  x[is.na(x)] = median(x, na.rm = TRUE)
+  x
+}
+
+outliers_out = apply(data[ ,(length(colnames(data))-13):(length(colnames(data)))], 2, replaceOutliers)
+data_v2 = data
+data_v2[ ,(length(colnames(data_v2))-13):(length(colnames(data_v2)))] = outliers_out
+summary(data_v2[ ,(length(colnames(data_v2))-13):(length(colnames(data_v2)))])
+
+
+  ## Nuevas variables
+
+data_v2$Comp_Investigativa = data_v2$`[Busco, ordeno, filtro, conecto y analizo información de internet con el fin de facilitar mis procesos de investigación.]` +
+  data_v2$`[Represento e interpreto datos e información de mis investigaciones en diversos formatos digitales.]` +
+  data_v2$`[Divulgo los resultados de mis investigaciones utilizando herramientas TIC tales como blogs, videos, presentaciones, infografías, redes sociales, entre otros.]` +
+  data_v2$`[Elaboro soluciones tecnológicas innovadoras para las problemáticas que he investigado en mi entorno.]` +
+  data_v2$`[Participo activamente en redes y comunidades de práctica, para la construcción colectiva de conocimientos con estudiantes y colegas con el apoyo de TIC.]`
+
+data_v2$Comp_Pedagogica = data_v2$`[Participo en procesos de formación en mi área y/o disciplina utilizando TIC]` +
+  data_v2$`[Incentivo en mis estudiantes el aprendizaje autónomo y colaborativo apoyados por TIC.]` +
+  data_v2$`[Hago seguimiento, retroalimentación y reconozco oportunidades de mejora de las implementaciones de estrategias que hacen uso de las TIC.]` +
+  data_v2$`[Construyo planes curriculares o proyectos pedagógicos mediados por las TIC de acuerdo con el desarrollo cognitivo, físico, psicológico y social de mis estudiantes.]`
+
+data_v2$Comp_Tecnologica = data_v2$`[Logro identificar las características, usos y oportunidades que ofrecen las herramientas teconológicas en los procesos educativos.]` +
+  data_v2$`[Utilizo diversas herramientas tecnológicas para mejorar la planeación y evaluación de mis prácticas educativas.]` +
+  data_v2$`[Promuevo el uso de plataformas digitales y portales web dando énfasis a sus lógicas y características propias.]` +
+  data_v2$`[Diseño y publico recursos educativos u objetivos virtuales de aprendizaje en plataformas digitales.]` +
+  data_v2$`[Diseño ambientes de aprendizaje haciendo uso de lenguajes, interfaces y otras herramientas tecnológicas.]`
+
+data_v2$Comp_Diseño = data_v2$`[Elaboro soluciones tecnológicas innovadoras para las problemáticas que he investigado en mi entorno.]` +
+  data_v2$`[Participo activamente en redes y comunidades de práctica, para la construcción colectiva de conocimientos con estudiantes y colegas con el apoyo de TIC.]` +
+  data_v2$`[Construyo planes curriculares o proyectos pedagógicos mediados por las TIC de acuerdo con el desarrollo cognitivo, físico, psicológico y social de mis estudiantes.]` +
+  data_v2$`[Diseño y publico recursos educativos u objetivos virtuales de aprendizaje en plataformas digitales.]` +
+  data_v2$`[Diseño ambientes de aprendizaje haciendo uso de lenguajes, interfaces y otras herramientas tecnológicas.]`
+
+summary(data_v2[ ,(length(colnames(data_v2))-3):(length(colnames(data_v2)))])
+
+ 

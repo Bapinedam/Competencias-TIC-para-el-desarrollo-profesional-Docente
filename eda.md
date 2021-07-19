@@ -28,7 +28,7 @@ table(data$Sexo)
 
     ## 
     ##            Femenino           Masculino Prefiero no decirlo 
-    ##                  50                  25                   2
+    ##                  57                  30                   2
 
 ``` r
 data_sexo = data %>% select(Sexo) %>% group_by(Sexo) %>% tally()
@@ -75,7 +75,7 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
   theme_bw()
 ```
 
-    ## Warning: Removed 9 rows containing non-finite values (stat_boxplot).
+    ## Warning: Removed 10 rows containing non-finite values (stat_boxplot).
 
 ![](eda_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
@@ -87,7 +87,7 @@ data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, int
 
     ## Warning: Expected 4 pieces. Additional pieces discarded in 1 rows [51].
 
-    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 74 rows [1, 2, 3,
+    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 86 rows [1, 2, 3,
     ## 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
@@ -252,3 +252,20 @@ data_rol %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataf
 ```
 
 ![](eda_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+## Área de trabajo para la construcción del RED u OVA
+
+``` r
+data_asignatura = data %>% group_by(`Área de trabajo para la construcción del RED u OVA`) %>% tally()
+data_asignatura$Porcentaje = data_asignatura$n / sum(data_asignatura$n)
+
+ggplot(data = data_asignatura, aes(x = "", y = Porcentaje, fill = `Área de trabajo para la construcción del RED u OVA`)) +
+  geom_bar(stat = "identity", width = 1) +
+  scale_y_continuous(labels = percent_format()) +
+  coord_polar("y", start = 0) +
+  theme_void() + 
+  
+  geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->

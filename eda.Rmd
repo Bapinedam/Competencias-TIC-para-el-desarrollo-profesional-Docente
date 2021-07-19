@@ -1,7 +1,9 @@
 ---
 title: "Análisis exploratorio de datos"
 author: "Brayam Pineda"
-output: github_document
+output: 
+  github_document: default
+  html_document: default 
 ---
 
 # Librerias
@@ -223,5 +225,20 @@ data_rol %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataf
   scale_y_continuous(labels = percent_format()) +
   ylab("") +
   theme_bw()
+```
+
+## Área de trabajo para la construcción del RED u OVA
+
+```{r}
+data_asignatura = data %>% group_by(`Área de trabajo para la construcción del RED u OVA`) %>% tally()
+data_asignatura$Porcentaje = data_asignatura$n / sum(data_asignatura$n)
+
+ggplot(data = data_asignatura, aes(x = "", y = Porcentaje, fill = `Área de trabajo para la construcción del RED u OVA`)) +
+  geom_bar(stat = "identity", width = 1) +
+  scale_y_continuous(labels = percent_format()) +
+  coord_polar("y", start = 0) +
+  theme_void() + 
+  
+  geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
 ```
 
