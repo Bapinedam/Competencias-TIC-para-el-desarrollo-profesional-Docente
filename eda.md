@@ -28,7 +28,7 @@ table(data$Sexo)
 
     ## 
     ##            Femenino           Masculino Prefiero no decirlo 
-    ##                  57                  30                   2
+    ##                  66                  32                   2
 
 ``` r
 data_sexo = data %>% select(Sexo) %>% group_by(Sexo) %>% tally()
@@ -75,7 +75,7 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
   theme_bw()
 ```
 
-    ## Warning: Removed 10 rows containing non-finite values (stat_boxplot).
+    ## Warning: Removed 12 rows containing non-finite values (stat_boxplot).
 
 ![](eda_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
@@ -85,9 +85,9 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
 data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
 ```
 
-    ## Warning: Expected 4 pieces. Additional pieces discarded in 1 rows [51].
+    ## Warning: Expected 4 pieces. Additional pieces discarded in 1 rows [50].
 
-    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 86 rows [1, 2, 3,
+    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 96 rows [1, 2, 3,
     ## 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
