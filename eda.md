@@ -28,7 +28,7 @@ table(data$Sexo)
 
     ## 
     ##            Femenino           Masculino Prefiero no decirlo 
-    ##                  66                  32                   2
+    ##                  72                  32                   2
 
 ``` r
 data_sexo = data %>% select(Sexo) %>% group_by(Sexo) %>% tally()
@@ -85,10 +85,10 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
 data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
 ```
 
-    ## Warning: Expected 4 pieces. Additional pieces discarded in 1 rows [50].
+    ## Warning: Expected 4 pieces. Additional pieces discarded in 2 rows [50, 105].
 
-    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 96 rows [1, 2, 3,
-    ## 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
+    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 101 rows [1, 2,
+    ## 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
 data_nivel_educativo2 = data_nivel_educativo %>% select(`Número de identificación`, `Nivel 1`, `Nivel 2`, `Nivel 3`,`Nivel 4`) %>%
@@ -269,3 +269,360 @@ ggplot(data = data_asignatura, aes(x = "", y = Porcentaje, fill = `Área de trab
 ```
 
 ![](eda_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+# Análisis Exploratorio de la Escala de Competencias TIC
+
+## Exploración de las variables
+
+``` r
+summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
+```
+
+    ##  [Busco, ordeno, filtro, conecto y analizo información de internet con el fin de facilitar mis procesos de investigación.]
+    ##  Min.   :0.000                                                                                                            
+    ##  1st Qu.:1.000                                                                                                            
+    ##  Median :2.000                                                                                                            
+    ##  Mean   :1.648                                                                                                            
+    ##  3rd Qu.:2.000                                                                                                            
+    ##  Max.   :2.000                                                                                                            
+    ##  NA's   :1                                                                                                                
+    ##  [Represento e interpreto datos e información de mis investigaciones en diversos formatos digitales.]
+    ##  Min.   :0.000                                                                                       
+    ##  1st Qu.:1.000                                                                                       
+    ##  Median :1.000                                                                                       
+    ##  Mean   :1.324                                                                                       
+    ##  3rd Qu.:2.000                                                                                       
+    ##  Max.   :2.000                                                                                       
+    ##  NA's   :1                                                                                           
+    ##  [Divulgo los resultados de mis investigaciones utilizando herramientas TIC tales como blogs, videos, presentaciones, infografías, redes sociales, entre otros.]
+    ##  Min.   :0.000                                                                                                                                                  
+    ##  1st Qu.:1.000                                                                                                                                                  
+    ##  Median :1.000                                                                                                                                                  
+    ##  Mean   :1.362                                                                                                                                                  
+    ##  3rd Qu.:2.000                                                                                                                                                  
+    ##  Max.   :2.000                                                                                                                                                  
+    ##  NA's   :1                                                                                                                                                      
+    ##  [Elaboro soluciones tecnológicas innovadoras para las problemáticas que he investigado en mi entorno.]
+    ##  Min.   :0.000                                                                                         
+    ##  1st Qu.:1.000                                                                                         
+    ##  Median :1.000                                                                                         
+    ##  Mean   :1.057                                                                                         
+    ##  3rd Qu.:2.000                                                                                         
+    ##  Max.   :2.000                                                                                         
+    ##  NA's   :1                                                                                             
+    ##  [Participo activamente en redes y comunidades de práctica, para la construcción colectiva de conocimientos con estudiantes y colegas con el apoyo de TIC.]
+    ##  Min.   :0.000                                                                                                                                             
+    ##  1st Qu.:1.000                                                                                                                                             
+    ##  Median :1.000                                                                                                                                             
+    ##  Mean   :1.238                                                                                                                                             
+    ##  3rd Qu.:2.000                                                                                                                                             
+    ##  Max.   :2.000                                                                                                                                             
+    ##  NA's   :1                                                                                                                                                 
+    ##  [Participo en procesos de formación en mi área y/o disciplina utilizando TIC]
+    ##  Min.   :0.000                                                                
+    ##  1st Qu.:1.000                                                                
+    ##  Median :2.000                                                                
+    ##  Mean   :1.533                                                                
+    ##  3rd Qu.:2.000                                                                
+    ##  Max.   :2.000                                                                
+    ##  NA's   :1                                                                    
+    ##  [Incentivo en mis estudiantes el aprendizaje autónomo y colaborativo apoyados por TIC.]
+    ##  Min.   :0.000                                                                          
+    ##  1st Qu.:1.000                                                                          
+    ##  Median :2.000                                                                          
+    ##  Mean   :1.514                                                                          
+    ##  3rd Qu.:2.000                                                                          
+    ##  Max.   :2.000                                                                          
+    ##  NA's   :1                                                                              
+    ##  [Hago seguimiento, retroalimentación y reconozco oportunidades de mejora de las implementaciones de estrategias que hacen uso de las TIC.]
+    ##  Min.   :0.000                                                                                                                             
+    ##  1st Qu.:1.000                                                                                                                             
+    ##  Median :1.000                                                                                                                             
+    ##  Mean   :1.337                                                                                                                             
+    ##  3rd Qu.:2.000                                                                                                                             
+    ##  Max.   :2.000                                                                                                                             
+    ##  NA's   :2                                                                                                                                 
+    ##  [Construyo planes curriculares o proyectos pedagógicos mediados por las TIC de acuerdo con el desarrollo cognitivo, físico, psicológico y social de mis estudiantes.]
+    ##  Min.   :0.000                                                                                                                                                        
+    ##  1st Qu.:1.000                                                                                                                                                        
+    ##  Median :1.000                                                                                                                                                        
+    ##  Mean   :1.245                                                                                                                                                        
+    ##  3rd Qu.:2.000                                                                                                                                                        
+    ##  Max.   :2.000                                                                                                                                                        
+    ##                                                                                                                                                                       
+    ##  [Logro identificar las características, usos y oportunidades que ofrecen las herramientas teconológicas en los procesos educativos.]
+    ##  Min.   :0.000                                                                                                                       
+    ##  1st Qu.:1.000                                                                                                                       
+    ##  Median :2.000                                                                                                                       
+    ##  Mean   :1.581                                                                                                                       
+    ##  3rd Qu.:2.000                                                                                                                       
+    ##  Max.   :2.000                                                                                                                       
+    ##  NA's   :1                                                                                                                           
+    ##  [Utilizo diversas herramientas tecnológicas para mejorar la planeación y evaluación de mis prácticas educativas.]
+    ##  Min.   :       0                                                                                                 
+    ##  1st Qu.:       1                                                                                                 
+    ##  Median :       2                                                                                                 
+    ##  Mean   :  285652                                                                                                 
+    ##  3rd Qu.:       2                                                                                                 
+    ##  Max.   :29993288                                                                                                 
+    ##  NA's   :1                                                                                                        
+    ##  [Promuevo el uso de plataformas digitales y portales web dando énfasis a sus lógicas y características propias.]
+    ##  Min.   :0.000                                                                                                   
+    ##  1st Qu.:1.000                                                                                                   
+    ##  Median :1.000                                                                                                   
+    ##  Mean   :1.324                                                                                                   
+    ##  3rd Qu.:2.000                                                                                                   
+    ##  Max.   :2.000                                                                                                   
+    ##  NA's   :1                                                                                                       
+    ##  [Diseño y publico recursos educativos u objetivos virtuales de aprendizaje en plataformas digitales.]
+    ##  Min.   :0.0000                                                                                       
+    ##  1st Qu.:0.0000                                                                                       
+    ##  Median :1.0000                                                                                       
+    ##  Mean   :0.8857                                                                                       
+    ##  3rd Qu.:1.0000                                                                                       
+    ##  Max.   :2.0000                                                                                       
+    ##  NA's   :1                                                                                            
+    ##  [Diseño ambientes de aprendizaje haciendo uso de lenguajes, interfaces y otras herramientas tecnológicas.]
+    ##  Min.   :0.0000                                                                                            
+    ##  1st Qu.:0.0000                                                                                            
+    ##  Median :1.0000                                                                                            
+    ##  Mean   :0.8857                                                                                            
+    ##  3rd Qu.:1.0000                                                                                            
+    ##  Max.   :2.0000                                                                                            
+    ##  NA's   :1
+
+### Quitando ourliers
+
+``` r
+replaceOutliers = function(x) {
+  q1 = quantile(x, na.rm = TRUE, 0.25)
+  q3 = quantile(x, na.rm = TRUE, 0.75)
+  x[x < q1] = median(x, na.rm = TRUE)
+  x[x > q3] = median(x, na.rm = TRUE)
+  x[is.na(x)] = median(x, na.rm = TRUE)
+  x
+}
+
+outliers_out = apply(data[ ,(length(colnames(data))-13):(length(colnames(data)))], 2, replaceOutliers)
+data_v2 = data
+data_v2[ ,(length(colnames(data_v2))-13):(length(colnames(data_v2)))] = outliers_out
+summary(data_v2[ ,(length(colnames(data_v2))-13):(length(colnames(data_v2)))])
+```
+
+    ##  [Busco, ordeno, filtro, conecto y analizo información de internet con el fin de facilitar mis procesos de investigación.]
+    ##  Min.   :1.000                                                                                                            
+    ##  1st Qu.:1.250                                                                                                            
+    ##  Median :2.000                                                                                                            
+    ##  Mean   :1.745                                                                                                            
+    ##  3rd Qu.:2.000                                                                                                            
+    ##  Max.   :2.000                                                                                                            
+    ##  [Represento e interpreto datos e información de mis investigaciones en diversos formatos digitales.]
+    ##  Min.   :1.000                                                                                       
+    ##  1st Qu.:1.000                                                                                       
+    ##  Median :1.000                                                                                       
+    ##  Mean   :1.425                                                                                       
+    ##  3rd Qu.:2.000                                                                                       
+    ##  Max.   :2.000                                                                                       
+    ##  [Divulgo los resultados de mis investigaciones utilizando herramientas TIC tales como blogs, videos, presentaciones, infografías, redes sociales, entre otros.]
+    ##  Min.   :1.000                                                                                                                                                  
+    ##  1st Qu.:1.000                                                                                                                                                  
+    ##  Median :1.000                                                                                                                                                  
+    ##  Mean   :1.453                                                                                                                                                  
+    ##  3rd Qu.:2.000                                                                                                                                                  
+    ##  Max.   :2.000                                                                                                                                                  
+    ##  [Elaboro soluciones tecnológicas innovadoras para las problemáticas que he investigado en mi entorno.]
+    ##  Min.   :1.000                                                                                         
+    ##  1st Qu.:1.000                                                                                         
+    ##  Median :1.000                                                                                         
+    ##  Mean   :1.255                                                                                         
+    ##  3rd Qu.:1.750                                                                                         
+    ##  Max.   :2.000                                                                                         
+    ##  [Participo activamente en redes y comunidades de práctica, para la construcción colectiva de conocimientos con estudiantes y colegas con el apoyo de TIC.]
+    ##  Min.   :1.000                                                                                                                                             
+    ##  1st Qu.:1.000                                                                                                                                             
+    ##  Median :1.000                                                                                                                                             
+    ##  Mean   :1.415                                                                                                                                             
+    ##  3rd Qu.:2.000                                                                                                                                             
+    ##  Max.   :2.000                                                                                                                                             
+    ##  [Participo en procesos de formación en mi área y/o disciplina utilizando TIC]
+    ##  Min.   :1.000                                                                
+    ##  1st Qu.:1.000                                                                
+    ##  Median :2.000                                                                
+    ##  Mean   :1.613                                                                
+    ##  3rd Qu.:2.000                                                                
+    ##  Max.   :2.000                                                                
+    ##  [Incentivo en mis estudiantes el aprendizaje autónomo y colaborativo apoyados por TIC.]
+    ##  Min.   :1.000                                                                          
+    ##  1st Qu.:1.000                                                                          
+    ##  Median :2.000                                                                          
+    ##  Mean   :1.651                                                                          
+    ##  3rd Qu.:2.000                                                                          
+    ##  Max.   :2.000                                                                          
+    ##  [Hago seguimiento, retroalimentación y reconozco oportunidades de mejora de las implementaciones de estrategias que hacen uso de las TIC.]
+    ##  Min.   :1.000                                                                                                                             
+    ##  1st Qu.:1.000                                                                                                                             
+    ##  Median :1.000                                                                                                                             
+    ##  Mean   :1.396                                                                                                                             
+    ##  3rd Qu.:2.000                                                                                                                             
+    ##  Max.   :2.000                                                                                                                             
+    ##  [Construyo planes curriculares o proyectos pedagógicos mediados por las TIC de acuerdo con el desarrollo cognitivo, físico, psicológico y social de mis estudiantes.]
+    ##  Min.   :1.00                                                                                                                                                         
+    ##  1st Qu.:1.00                                                                                                                                                         
+    ##  Median :1.00                                                                                                                                                         
+    ##  Mean   :1.34                                                                                                                                                         
+    ##  3rd Qu.:2.00                                                                                                                                                         
+    ##  Max.   :2.00                                                                                                                                                         
+    ##  [Logro identificar las características, usos y oportunidades que ofrecen las herramientas teconológicas en los procesos educativos.]
+    ##  Min.   :1.000                                                                                                                       
+    ##  1st Qu.:1.000                                                                                                                       
+    ##  Median :2.000                                                                                                                       
+    ##  Mean   :1.604                                                                                                                       
+    ##  3rd Qu.:2.000                                                                                                                       
+    ##  Max.   :2.000                                                                                                                       
+    ##  [Utilizo diversas herramientas tecnológicas para mejorar la planeación y evaluación de mis prácticas educativas.]
+    ##  Min.   :1.000                                                                                                    
+    ##  1st Qu.:1.000                                                                                                    
+    ##  Median :2.000                                                                                                    
+    ##  Mean   :1.547                                                                                                    
+    ##  3rd Qu.:2.000                                                                                                    
+    ##  Max.   :2.000                                                                                                    
+    ##  [Promuevo el uso de plataformas digitales y portales web dando énfasis a sus lógicas y características propias.]
+    ##  Min.   :1.000                                                                                                   
+    ##  1st Qu.:1.000                                                                                                   
+    ##  Median :1.000                                                                                                   
+    ##  Mean   :1.425                                                                                                   
+    ##  3rd Qu.:2.000                                                                                                   
+    ##  Max.   :2.000                                                                                                   
+    ##  [Diseño y publico recursos educativos u objetivos virtuales de aprendizaje en plataformas digitales.]
+    ##  Min.   :0.0000                                                                                       
+    ##  1st Qu.:0.0000                                                                                       
+    ##  Median :1.0000                                                                                       
+    ##  Mean   :0.6887                                                                                       
+    ##  3rd Qu.:1.0000                                                                                       
+    ##  Max.   :1.0000                                                                                       
+    ##  [Diseño ambientes de aprendizaje haciendo uso de lenguajes, interfaces y otras herramientas tecnológicas.]
+    ##  Min.   :0.0000                                                                                            
+    ##  1st Qu.:0.0000                                                                                            
+    ##  Median :1.0000                                                                                            
+    ##  Mean   :0.6792                                                                                            
+    ##  3rd Qu.:1.0000                                                                                            
+    ##  Max.   :1.0000
+
+## Calificación de las escalas
+
+``` r
+data_v2$Comp_Investigativa = data_v2$`[Busco, ordeno, filtro, conecto y analizo información de internet con el fin de facilitar mis procesos de investigación.]` +
+  data_v2$`[Represento e interpreto datos e información de mis investigaciones en diversos formatos digitales.]` +
+  data_v2$`[Divulgo los resultados de mis investigaciones utilizando herramientas TIC tales como blogs, videos, presentaciones, infografías, redes sociales, entre otros.]` +
+  data_v2$`[Elaboro soluciones tecnológicas innovadoras para las problemáticas que he investigado en mi entorno.]` +
+  data_v2$`[Participo activamente en redes y comunidades de práctica, para la construcción colectiva de conocimientos con estudiantes y colegas con el apoyo de TIC.]`
+
+data_v2$Comp_Pedagogica = data_v2$`[Participo en procesos de formación en mi área y/o disciplina utilizando TIC]` +
+  data_v2$`[Incentivo en mis estudiantes el aprendizaje autónomo y colaborativo apoyados por TIC.]` +
+  data_v2$`[Hago seguimiento, retroalimentación y reconozco oportunidades de mejora de las implementaciones de estrategias que hacen uso de las TIC.]` +
+  data_v2$`[Construyo planes curriculares o proyectos pedagógicos mediados por las TIC de acuerdo con el desarrollo cognitivo, físico, psicológico y social de mis estudiantes.]`
+
+data_v2$Comp_Tecnologica = data_v2$`[Logro identificar las características, usos y oportunidades que ofrecen las herramientas teconológicas en los procesos educativos.]` +
+  data_v2$`[Utilizo diversas herramientas tecnológicas para mejorar la planeación y evaluación de mis prácticas educativas.]` +
+  data_v2$`[Promuevo el uso de plataformas digitales y portales web dando énfasis a sus lógicas y características propias.]` +
+  data_v2$`[Diseño y publico recursos educativos u objetivos virtuales de aprendizaje en plataformas digitales.]` +
+  data_v2$`[Diseño ambientes de aprendizaje haciendo uso de lenguajes, interfaces y otras herramientas tecnológicas.]`
+
+data_v2$Comp_Diseño = data_v2$`[Elaboro soluciones tecnológicas innovadoras para las problemáticas que he investigado en mi entorno.]` +
+  data_v2$`[Participo activamente en redes y comunidades de práctica, para la construcción colectiva de conocimientos con estudiantes y colegas con el apoyo de TIC.]` +
+  data_v2$`[Construyo planes curriculares o proyectos pedagógicos mediados por las TIC de acuerdo con el desarrollo cognitivo, físico, psicológico y social de mis estudiantes.]` +
+  data_v2$`[Diseño y publico recursos educativos u objetivos virtuales de aprendizaje en plataformas digitales.]` +
+  data_v2$`[Diseño ambientes de aprendizaje haciendo uso de lenguajes, interfaces y otras herramientas tecnológicas.]`
+
+summary(data_v2[ ,(length(colnames(data_v2))-3):(length(colnames(data_v2)))])
+```
+
+    ##  Comp_Investigativa Comp_Pedagogica Comp_Tecnologica  Comp_Diseño   
+    ##  Min.   : 5.000     Min.   :4       Min.   :3.000    Min.   :3.000  
+    ##  1st Qu.: 6.000     1st Qu.:5       1st Qu.:5.000    1st Qu.:4.000  
+    ##  Median : 7.000     Median :6       Median :6.000    Median :5.000  
+    ##  Mean   : 7.292     Mean   :6       Mean   :5.943    Mean   :5.377  
+    ##  3rd Qu.: 9.000     3rd Qu.:7       3rd Qu.:8.000    3rd Qu.:7.000  
+    ##  Max.   :10.000     Max.   :8       Max.   :8.000    Max.   :8.000
+
+## Exploración de competencias
+
+``` r
+data_competencias = data_v2 %>% select(Comp_Investigativa, Comp_Pedagogica, Comp_Tecnologica, Comp_Diseño) %>%
+  pivot_longer(cols = c(Comp_Investigativa, Comp_Pedagogica, Comp_Tecnologica, Comp_Diseño),names_to = "Competencia", values_to = "Puntaje")
+```
+
+    ## Adding missing grouping variables: `Número de identificación`
+
+``` r
+data_competencias %>% ggplot(aes(x = as.factor(Competencia), y = Puntaje)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  xlab("") +
+  theme_bw() 
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+La competencia de diseño es aquella que menos está ‘trabajada’.
+
+Veamos gráficamente la distribución entre los grupos.
+
+### Competencia Tecnoglógica
+
+``` r
+ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Tecnologica)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  coord_flip() +
+  ggtitle("Competencia Tecnológica") +
+  ylab("") +
+  xlab("") +
+  ylim(1, 10) +
+  theme_bw() 
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+### Competencia Pedagógica
+
+``` r
+ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Pedagogica)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  coord_flip() +
+  ggtitle("Competencia Pedagógica") +
+  ylab("") +
+  xlab("") +
+  ylim(1, 10) +
+  theme_bw()
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+### Competencias Investigativa
+
+``` r
+ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Investigativa)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  coord_flip() +
+  ggtitle("Competencia Investigativa") +
+  ylab("") +
+  xlab("") +
+  ylim(1, 10) +
+  theme_bw()
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+### Competencia de Diseño
+
+``` r
+ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Diseño)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  coord_flip() +
+  ggtitle("Competencia de Diseño") +
+  ylab("") +
+  xlab("") +
+  ylim(1, 10) +
+  theme_bw() 
+```
+
+![](eda_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->

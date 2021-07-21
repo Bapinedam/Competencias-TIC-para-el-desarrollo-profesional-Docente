@@ -278,4 +278,101 @@ data_v2$Comp_Diseño = data_v2$`[Elaboro soluciones tecnológicas innovadoras pa
 
 summary(data_v2[ ,(length(colnames(data_v2))-3):(length(colnames(data_v2)))])
 
- 
+  ## Exploración de competencias
+
+data_competencias = data_v2 %>% select(Comp_Investigativa, Comp_Pedagogica, Comp_Tecnologica, Comp_Diseño) %>%
+  pivot_longer(cols = c(Comp_Investigativa, Comp_Pedagogica, Comp_Tecnologica, Comp_Diseño),names_to = "Competencia", values_to = "Puntaje")
+
+data_competencias %>% ggplot(aes(x = as.factor(Competencia), y = Puntaje)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  xlab("") +
+  theme_bw() 
+
+  ## La competencia de diseño es aquella que menos está 'trabajada'.
+
+  ## Veamos gráficamente la distribución entre los grupos
+
+### Competencia Tecnoglógica
+
+ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Tecnologica)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  coord_flip() +
+  ggtitle("Competencia Tecnológica") +
+  ylab("") +
+  xlab("") +
+  ylim(1, 10) +
+  theme_bw() 
+
+### Competencia Pedagógica
+
+ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Pedagogica)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  coord_flip() +
+  ggtitle("Competencia Pedagógica") +
+  ylab("") +
+  xlab("") +
+  ylim(1, 10) +
+  theme_bw() 
+
+### Competencias Investigativa
+
+ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Investigativa)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  coord_flip() +
+  ggtitle("Competencia Investigativa") +
+  ylab("") +
+  xlab("") +
+  ylim(1, 10) +
+  theme_bw()
+
+### Competencia de Diseño
+
+ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Diseño)) +
+  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  coord_flip() +
+  ggtitle("Competencia de Diseño") +
+  ylab("") +
+  xlab("") +
+  ylim(1, 10) +
+  theme_bw() 
+
+
+
+
+######### Pruebas estadísticas ######
+
+
+  ### Supuestos
+
+  #### Normalidad
+
+require(nortest)
+by(data = data_competencias, INDICES = data_competencias$Competencia, FUN = function(x) shapiro.test(x$Puntaje))
+
+  #### Homocedasticidad
+
+require(car)
+leveneTest(Puntaje ~ Competencia, data_competencias, center = "median")
+
+  #### Los supuestos no se cumplen por lo que se procede a hacer una
+  #### prueba de ANOV de una vía con corrección de "welch"
+
+  ### ANOVA de una vía con corrección de Welch
+
+anova = oneway.test(data_competencias$Puntaje ~ data_competencias$Competencia)
+anova
+
+  ### Prueba U de Mann Whitney para diferencias significativas
+  ### entre dos grupos
+
+pairwise.wilcox.test(x = data_competencias$Puntaje, g = data_competencias$Competencia,
+                p.adjust.method = "holm",
+                pool.sd = TRUE, paired = FALSE, alternative = "two.sided")
+
+  ### Como es posible observar existen diferencias significativas
+  ### entre los grupos, con excepción de las competencias pedagógicas
+  ### y lasinvestigativas
+
+
+
+
