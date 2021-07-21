@@ -239,8 +239,8 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
 replaceOutliers = function(x) {
   q1 = quantile(x, na.rm = TRUE, 0.25)
   q3 = quantile(x, na.rm = TRUE, 0.75)
-  x[x < q1] = median(x, na.rm = TRUE)
-  x[x > q3] = median(x, na.rm = TRUE)
+  x[x < 0] = median(x, na.rm = TRUE)
+  x[x > 2] = median(x, na.rm = TRUE)
   x[is.na(x)] = median(x, na.rm = TRUE)
   x
 }

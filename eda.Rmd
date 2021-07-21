@@ -6,6 +6,12 @@ output:
   html_document: default 
 ---
 
+Este documento presenta el Análisis Exploratorio de Datos de la aplicación del Instrumento de Competencias TIC desarrollado por el Grupo de Innovación, Tecnogología e Innovación -GITEI de la Universidad Nacional de Colombia. Además se incluyeron cinco (5) preguntas adicionales para la evaluación de una nueva competencia, de Diseño.
+
+La evaluación hace parte del proceso de acompañamiento “Fortalecimiento de competencias investigativas, tecnológicas y pedagógicas de docentes del sector ocial de educación preescolar, básica y media, mediante la producción de Recursos Educativos Digitales –RED y Objetos Virtuales de Aprendizaje -OVA”, que nace gracias a la alianza entre el Ministerio de Educación Nacional, el Ministerio de Ciencia, Tecnología e Innovación, y los Centros de Innovación Educativa Regional de las zonas Norte, Centro y Sur del país operados por la Universidad de Cartagena, la Universidad Nacional de Colombia y la Universidad del Valle. 
+
+El análisis se desarrolló usando el entorno de software libre R y RStudio, el código se deja visible, sin embargo aquel que muestre información confidencial será ocultado.
+
 # Librerias
 
 ```{r message=FALSE}
@@ -18,9 +24,7 @@ library(tidyverse)
 
 # Datos
 
-Debido a que la información es confidencial no se publica el código ni el _head()_ acostumbrado. 
-
-Los datos consisten en las respuetas de los docentes interesados en el proyecto a una escala 
+*Debido a que la información es confidencial no se publica ni el código de acceso a la misma ni el _head()_ acostumbrado. 
 
 ```{r echo=FALSE, include=FALSE}
 # Autenticación de usuario
@@ -40,6 +44,8 @@ data = data %>% group_by(`Número de identificación`) %>% top_n(1, `Marca tempo
 columnas = data.frame(Columnas = colnames(data))
 ```
 
+# Analisis Exploratorio de Datos sociodemográficos
+
 ## Sexo
 
 ```{r}
@@ -54,6 +60,8 @@ ggplot(data = data_sexo, aes(x = Sexo, y = Porcentaje)) +
   theme_bw()
 ```
 
+Como es posible observar cerca del 70% de los evaluados son mujeres, frente a un 30% de hombres.
+
 ## Edad
 
 ```{r}
@@ -63,7 +71,10 @@ par(mar=c(0, 3.1, 1.1, 2.1))
 boxplot(data$`Edad (en años)`, horizontal=TRUE , ylim=c(20,60), xaxt="n" , col=rgb(0.8,0.8,0,0.5) , frame=F)
 par(mar=c(4, 3.1, 1.1, 2.1))
 hist(data$`Edad (en años)`, breaks=40, col=rgb(0.2,0.8,0.5,0.5) , border=F , main="" , xlab="Edad", xlim=c(20,60))
+summary(data$`Edad (en años)`)
 ```
+
+El rango de la población se encuentra entre 26 y 66 años, además el 50% de la población se encuentra entre los 35 y los 46,50 años de edad.
 
 ## Edad por sexo
 
@@ -75,7 +86,11 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
   theme_bw()
 ```
 
+En cuanto a la edad según el sexo del evaluado, es posible decir que pese a que las medianas de los grupos sea similar, la dispersión de la variable en los hombres es menor.
+
 ## Nivel educativo en el que enseña
+
+Debido a que la pregunta que permitió de colectar esta información fue abierta, es necesario primero hacer limpieza de esa información para luego proceder a explorarla.
 
 ```{r}
 data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
@@ -110,7 +125,11 @@ data_nivel_educativo3 %>% arrange(Porcentaje) %>%    # First sort by val. This s
   xlab("")
 ```
 
+De acuerdo con la información presentada, cerca del 60% de los docentes pertenecen a educación secundaria y media.
+
 ## Máximo nivel educativo alcanzado por los docentes
+
+Al igual que con la variable anterior, es necesario hacer limpieza de la información previo al análisis.
 
 ```{r}
 data_educacion_docente = data %>% select(`Número de identificación`, 
@@ -160,6 +179,8 @@ ggplot(data = data_educacion_docente, aes(x = "", y = Porcentaje, fill = `Aproba
   geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
 ```
 
+Con base en la información es posible afirmar que el 85% de los evaluados tiene postgrado, y la mayoría corresponde a Maestría.
+
 ## Estatuto docente
 
 ```{r}
@@ -168,10 +189,12 @@ data_estatuto$Porcentaje = data_estatuto$n / sum(data_estatuto$n)
 
 ggplot(data = data_estatuto, aes(x = `¿En qué estatuto docente se encuentra actualmente?`, y = Porcentaje)) + 
   geom_bar(stat = "identity", fill="dodgerblue", alpha=.6, width=.4) +
-  scale_y_continuous(labels = percent_format()) +
+  scale_y_continuous(limits = c(0, 1), labels = percent_format()) +
   ylab("") +
   theme_bw()
 ```
+
+De acuerdo con la gráfica cerca de un 85% de los docentes están escalafonados según el Decreto 1278 de 2002 frente a un 14% que lo está según el Decrto 2277 de 1979.
 
 ## Departamento de origen
 
@@ -207,6 +230,8 @@ data_departamento2 %>% arrange(Porcentaje) %>%    # First sort by val. This sort
   xlab("")
 ```
 
+Con base en la información, el departamento de origen de los docentes con mayor representación es cundinamarca, seguido de Boyacá y Tolima, y los de menor Antioquia y Quindio. Así también, los sujetos provienen de 17 departamentos disntintos.
+
 ## Rol dentro de la institución
 
 ```{r}
@@ -222,10 +247,12 @@ data_rol %>% arrange(Porcentaje) %>%    # First sort by val. This sort the dataf
   mutate(name=factor(`Rol en su comunidad educativa`, levels=`Rol en su comunidad educativa`)) %>%   # This trick update the factor levels
   ggplot(aes(x=name, y=Porcentaje)) +
   geom_bar(stat = "identity", fill="lightpink2", alpha=.6, width=.4) +
-  scale_y_continuous(labels = percent_format()) +
+  scale_y_continuous(limits = c(0, 1), labels = percent_format()) +
   ylab("") +
   theme_bw()
 ```
+
+Si bien el programa está dirigido a docentes, también hay breves porcentajes cuyas personas cumplen diferetens roles dentro de las instituciones. 
 
 ## Área de trabajo para la construcción del RED u OVA
 
@@ -242,7 +269,9 @@ ggplot(data = data_asignatura, aes(x = "", y = Porcentaje, fill = `Área de trab
   geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
 ```
 
-# Análisis Exploratorio de la Escala de Competencias TIC
+De las cuatro posibles áreas de trabajo para el desarrollo del RED u OVA, la mayor parte de los docentes escogió _Competencas ciudadanas y habilidades socio emocionales_, por otro lado las demás áreas tienen distribuciones similares.
+
+# Análisis Exploratorio del Intrumento de Competencias TIC
 
 ## Exploración de las variables
 
@@ -254,10 +283,8 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
 
 ```{r}
 replaceOutliers = function(x) {
-  q1 = quantile(x, na.rm = TRUE, 0.25)
-  q3 = quantile(x, na.rm = TRUE, 0.75)
-  x[x < q1] = median(x, na.rm = TRUE)
-  x[x > q3] = median(x, na.rm = TRUE)
+  x[x < 0] = median(x, na.rm = TRUE)
+  x[x > 2] = median(x, na.rm = TRUE)
   x[is.na(x)] = median(x, na.rm = TRUE)
   x
 }
@@ -317,7 +344,7 @@ Veamos gráficamente la distribución entre los grupos.
 
 ```{r}
 ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Tecnologica)) +
-  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  geom_boxplot(fill = "navyblue", alpha = 0.5) +
   coord_flip() +
   ggtitle("Competencia Tecnológica") +
   ylab("") +
@@ -330,7 +357,7 @@ ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u
 
 ```{r}
 ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Pedagogica)) +
-  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  geom_boxplot(fill = "navyblue", alpha = 0.5) +
   coord_flip() +
   ggtitle("Competencia Pedagógica") +
   ylab("") +
@@ -343,7 +370,7 @@ ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u
 
 ```{r}
 ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Investigativa)) +
-  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  geom_boxplot(fill = "navyblue", alpha = 0.5) +
   coord_flip() +
   ggtitle("Competencia Investigativa") +
   ylab("") +
@@ -356,7 +383,7 @@ ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u
 
 ```{r}
 ggplot(data = data_v2, aes(x = `Área de trabajo para la construcción del RED u OVA`, y = Comp_Diseño)) +
-  geom_boxplot(fill = "goldenrod2", alpha = 0.5) +
+  geom_boxplot(fill = "navyblue", alpha = 0.5) +
   coord_flip() +
   ggtitle("Competencia de Diseño") +
   ylab("") +
