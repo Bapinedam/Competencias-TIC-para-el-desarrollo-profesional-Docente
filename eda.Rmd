@@ -279,7 +279,7 @@ De las cuatro posibles áreas de trabajo para el desarrollo del RED u OVA, la ma
 summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
 ```
 
-### Quitando ourliers
+### Quitando ourliers y NA's
 
 ```{r}
 replaceOutliers = function(x) {
