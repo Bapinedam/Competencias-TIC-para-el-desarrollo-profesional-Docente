@@ -3,3 +3,4 @@
 .user
 *.Rmd
 *.R
+.Rproj.user
