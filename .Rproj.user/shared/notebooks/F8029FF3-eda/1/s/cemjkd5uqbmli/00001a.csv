@@ -1,4 +1,0 @@
-"0","layout(mat = matrix(c(1,2),2,1, byrow=TRUE),  height = c(1,8))"
-"0",""
-"0","par(mar=c(0, 3.1, 1.1, 2.1))"
-"0","boxplot(data$`Edad (en años)`, horizontal=TRUE , ylim=c(20,70), xaxt=""n"" , col=rgb(0.8,0.8,0,0.5) , frame=F)"

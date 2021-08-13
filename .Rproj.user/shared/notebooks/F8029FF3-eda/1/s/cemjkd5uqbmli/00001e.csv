@@ -1,1 +1,0 @@
-"0","hist(data$`Edad (en años)`, breaks=50, col=rgb(0.2,0.8,0.5,0.5) , border=F , main="""" , xlab=""Edad"", xlim=c(20,70))"

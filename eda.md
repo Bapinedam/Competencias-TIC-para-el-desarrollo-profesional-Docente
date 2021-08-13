@@ -47,7 +47,7 @@ table(data$Sexo)
 
     ## 
     ##            Femenino           Masculino Prefiero no decirlo 
-    ##                  92                  42                   1
+    ##                 124                  55                   1
 
 ``` r
 data_sexo = data %>% select(Sexo) %>% group_by(Sexo) %>% tally()
@@ -88,7 +88,7 @@ summary(data$`Edad (en años)`)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-    ##   26.00   35.00   41.00   41.69   47.00   66.00      14
+    ##   26.00   36.00   42.00   43.12   50.00   67.00      18
 
 El rango de la población se encuentra entre 26 y 66 años, además el 50%
 de la población se encuentra entre los 35 y los 46,50 años de edad.
@@ -107,7 +107,7 @@ ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en años)`, fill = Sexo))
   theme_bw()
 ```
 
-    ## Warning: Removed 14 rows containing non-finite values (stat_boxplot).
+    ## Warning: Removed 18 rows containing non-finite values (stat_boxplot).
 
 ![](eda_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
@@ -125,9 +125,9 @@ luego proceder a explorarla.
 data_nivel_educativo = data %>% separate(`Nivel educativo en el que labora`, into = paste("Nivel", 1:4),sep = ",")
 ```
 
-    ## Warning: Expected 4 pieces. Additional pieces discarded in 2 rows [62, 88].
+    ## Warning: Expected 4 pieces. Additional pieces discarded in 2 rows [57, 82].
 
-    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 130 rows [1, 2,
+    ## Warning: Expected 4 pieces. Missing pieces filled with `NA` in 174 rows [1, 2,
     ## 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
 
 ``` r
@@ -216,7 +216,7 @@ ggplot(data = data_educacion_docente, aes(x = "", y = Porcentaje, fill = `Aproba
   coord_polar("y", start = 0) +
   theme_void() + 
   
-  geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=6, position=position_stack(vjust=0.5)) 
+  geom_text(aes(y = Porcentaje, label = percent(Porcentaje)), color = "white", size=4, position=position_stack(vjust=0.5)) 
 ```
 
 ![](eda_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
@@ -294,7 +294,12 @@ los de menor Antioquia y Quindio. Así también, los sujetos provienen de
 ``` r
 data_rol = data %>% select(`Número de identificación`, `Rol en su comunidad educativa`)
 
-data_rol$`Rol en su comunidad educativa` = gsub("Docente Tutor PTA", "Tutor PTA", data_rol$`Rol en su comunidad educativa`)
+data_rol$`Rol en su comunidad educativa` = str_to_upper(data_rol$`Rol en su comunidad educativa`)
+data_rol$`Rol en su comunidad educativa` = gsub("DOCENTE TUTOR PTA", "TUTOR PTA", data_rol$`Rol en su comunidad educativa`)
+data_rol$`Rol en su comunidad educativa` = gsub("\\(", "", data_rol$`Rol en su comunidad educativa`)
+data_rol$`Rol en su comunidad educativa` = gsub(")", "", data_rol$`Rol en su comunidad educativa`)
+data_rol$`Rol en su comunidad educativa` = gsub("^TUTOR PROGRAMA TODOS A APRENDER PTA", "TUTOR PTA", data_rol$`Rol en su comunidad educativa`)
+data_rol$`Rol en su comunidad educativa` = gsub("DOCNETE - TUTOR", "TUTOR PTA", data_rol$`Rol en su comunidad educativa`)
 
 data_rol = data_rol %>% group_by(`Rol en su comunidad educativa`) %>% tally()
 
@@ -349,7 +354,7 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
     ##  Min.   :0.000                                                                                                            
     ##  1st Qu.:1.000                                                                                                            
     ##  Median :2.000                                                                                                            
-    ##  Mean   :1.664                                                                                                            
+    ##  Mean   :1.676                                                                                                            
     ##  3rd Qu.:2.000                                                                                                            
     ##  Max.   :2.000                                                                                                            
     ##  NA's   :1                                                                                                                
@@ -357,39 +362,39 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
     ##  Min.   :0.000                                                                                       
     ##  1st Qu.:1.000                                                                                       
     ##  Median :1.000                                                                                       
-    ##  Mean   :1.321                                                                                       
+    ##  Mean   :1.318                                                                                       
     ##  3rd Qu.:2.000                                                                                       
     ##  Max.   :2.000                                                                                       
     ##  NA's   :1                                                                                           
     ##  [Divulgo los resultados de mis investigaciones utilizando herramientas TIC tales como blogs, videos, presentaciones, infografías, redes sociales, entre otros.]
-    ##  Min.   :0.000                                                                                                                                                  
-    ##  1st Qu.:1.000                                                                                                                                                  
-    ##  Median :1.000                                                                                                                                                  
-    ##  Mean   :1.358                                                                                                                                                  
-    ##  3rd Qu.:2.000                                                                                                                                                  
-    ##  Max.   :2.000                                                                                                                                                  
+    ##  Min.   :0.00                                                                                                                                                   
+    ##  1st Qu.:1.00                                                                                                                                                   
+    ##  Median :1.00                                                                                                                                                   
+    ##  Mean   :1.33                                                                                                                                                   
+    ##  3rd Qu.:2.00                                                                                                                                                   
+    ##  Max.   :2.00                                                                                                                                                   
     ##  NA's   :1                                                                                                                                                      
     ##  [Elaboro soluciones tecnológicas innovadoras para las problemáticas que he investigado en mi entorno.]
-    ##  Min.   :0.00                                                                                          
-    ##  1st Qu.:1.00                                                                                          
-    ##  Median :1.00                                                                                          
-    ##  Mean   :1.06                                                                                          
-    ##  3rd Qu.:1.75                                                                                          
-    ##  Max.   :2.00                                                                                          
-    ##  NA's   :1                                                                                             
+    ##  Min.   :0.000                                                                                         
+    ##  1st Qu.:1.000                                                                                         
+    ##  Median :1.000                                                                                         
+    ##  Mean   :1.034                                                                                         
+    ##  3rd Qu.:1.000                                                                                         
+    ##  Max.   :2.000                                                                                         
+    ##  NA's   :2                                                                                             
     ##  [Participo activamente en redes y comunidades de práctica, para la construcción colectiva de conocimientos con estudiantes y colegas con el apoyo de TIC.]
-    ##  Min.   :0.000                                                                                                                                             
-    ##  1st Qu.:1.000                                                                                                                                             
-    ##  Median :1.000                                                                                                                                             
-    ##  Mean   :1.209                                                                                                                                             
-    ##  3rd Qu.:2.000                                                                                                                                             
-    ##  Max.   :2.000                                                                                                                                             
+    ##  Min.   :0.00                                                                                                                                              
+    ##  1st Qu.:1.00                                                                                                                                              
+    ##  Median :1.00                                                                                                                                              
+    ##  Mean   :1.14                                                                                                                                              
+    ##  3rd Qu.:2.00                                                                                                                                              
+    ##  Max.   :2.00                                                                                                                                              
     ##  NA's   :1                                                                                                                                                 
     ##  [Participo en procesos de formación en mi área y/o disciplina utilizando TIC]
     ##  Min.   :0.000                                                                
     ##  1st Qu.:1.000                                                                
     ##  Median :2.000                                                                
-    ##  Mean   :1.522                                                                
+    ##  Mean   :1.486                                                                
     ##  3rd Qu.:2.000                                                                
     ##  Max.   :2.000                                                                
     ##  NA's   :1                                                                    
@@ -397,7 +402,7 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
     ##  Min.   :0.000                                                                          
     ##  1st Qu.:1.000                                                                          
     ##  Median :2.000                                                                          
-    ##  Mean   :1.526                                                                          
+    ##  Mean   :1.534                                                                          
     ##  3rd Qu.:2.000                                                                          
     ##  Max.   :2.000                                                                          
     ##  NA's   :2                                                                              
@@ -405,31 +410,31 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
     ##  Min.   :0.000                                                                                                                             
     ##  1st Qu.:1.000                                                                                                                             
     ##  Median :1.000                                                                                                                             
-    ##  Mean   :1.376                                                                                                                             
+    ##  Mean   :1.365                                                                                                                             
     ##  3rd Qu.:2.000                                                                                                                             
     ##  Max.   :2.000                                                                                                                             
     ##  NA's   :2                                                                                                                                 
     ##  [Construyo planes curriculares o proyectos pedagógicos mediados por las TIC de acuerdo con el desarrollo cognitivo, físico, psicológico y social de mis estudiantes.]
-    ##  Min.   :0.0                                                                                                                                                          
-    ##  1st Qu.:1.0                                                                                                                                                          
-    ##  Median :1.0                                                                                                                                                          
-    ##  Mean   :1.2                                                                                                                                                          
-    ##  3rd Qu.:2.0                                                                                                                                                          
-    ##  Max.   :2.0                                                                                                                                                          
+    ##  Min.   :0.000                                                                                                                                                        
+    ##  1st Qu.:1.000                                                                                                                                                        
+    ##  Median :1.000                                                                                                                                                        
+    ##  Mean   :1.211                                                                                                                                                        
+    ##  3rd Qu.:2.000                                                                                                                                                        
+    ##  Max.   :2.000                                                                                                                                                        
     ##                                                                                                                                                                       
     ##  [Logro identificar las características, usos y oportunidades que ofrecen las herramientas teconológicas en los procesos educativos.]
     ##  Min.   :0.000                                                                                                                       
     ##  1st Qu.:1.000                                                                                                                       
     ##  Median :2.000                                                                                                                       
-    ##  Mean   :1.575                                                                                                                       
+    ##  Mean   :1.567                                                                                                                       
     ##  3rd Qu.:2.000                                                                                                                       
     ##  Max.   :2.000                                                                                                                       
-    ##  NA's   :1                                                                                                                           
+    ##  NA's   :2                                                                                                                           
     ##  [Utilizo diversas herramientas tecnológicas para mejorar la planeación y evaluación de mis prácticas educativas.]
     ##  Min.   :0.000                                                                                                    
     ##  1st Qu.:1.000                                                                                                    
     ##  Median :2.000                                                                                                    
-    ##  Mean   :1.522                                                                                                    
+    ##  Mean   :1.492                                                                                                    
     ##  3rd Qu.:2.000                                                                                                    
     ##  Max.   :2.000                                                                                                    
     ##  NA's   :1                                                                                                        
@@ -437,7 +442,7 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
     ##  Min.   :0.000                                                                                                   
     ##  1st Qu.:1.000                                                                                                   
     ##  Median :1.000                                                                                                   
-    ##  Mean   :1.358                                                                                                   
+    ##  Mean   :1.318                                                                                                   
     ##  3rd Qu.:2.000                                                                                                   
     ##  Max.   :2.000                                                                                                   
     ##  NA's   :1                                                                                                       
@@ -445,7 +450,7 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
     ##  Min.   :0.0000                                                                                       
     ##  1st Qu.:0.0000                                                                                       
     ##  Median :1.0000                                                                                       
-    ##  Mean   :0.9104                                                                                       
+    ##  Mean   :0.8324                                                                                       
     ##  3rd Qu.:1.0000                                                                                       
     ##  Max.   :2.0000                                                                                       
     ##  NA's   :1                                                                                            
@@ -453,7 +458,7 @@ summary(data[ ,(length(colnames(data))-13):(length(colnames(data)))])
     ##  Min.   :0.0000                                                                                            
     ##  1st Qu.:0.0000                                                                                            
     ##  Median :1.0000                                                                                            
-    ##  Mean   :0.8507                                                                                            
+    ##  Mean   :0.8045                                                                                            
     ##  3rd Qu.:1.0000                                                                                            
     ##  Max.   :2.0000                                                                                            
     ##  NA's   :1
@@ -478,98 +483,98 @@ summary(data_v2[ ,(length(colnames(data_v2))-13):(length(colnames(data_v2)))])
     ##  Min.   :0.000                                                                                                            
     ##  1st Qu.:1.000                                                                                                            
     ##  Median :2.000                                                                                                            
-    ##  Mean   :1.667                                                                                                            
+    ##  Mean   :1.678                                                                                                            
     ##  3rd Qu.:2.000                                                                                                            
     ##  Max.   :2.000                                                                                                            
     ##  [Represento e interpreto datos e información de mis investigaciones en diversos formatos digitales.]
     ##  Min.   :0.000                                                                                       
     ##  1st Qu.:1.000                                                                                       
     ##  Median :1.000                                                                                       
-    ##  Mean   :1.319                                                                                       
+    ##  Mean   :1.317                                                                                       
     ##  3rd Qu.:2.000                                                                                       
     ##  Max.   :2.000                                                                                       
     ##  [Divulgo los resultados de mis investigaciones utilizando herramientas TIC tales como blogs, videos, presentaciones, infografías, redes sociales, entre otros.]
     ##  Min.   :0.000                                                                                                                                                  
     ##  1st Qu.:1.000                                                                                                                                                  
     ##  Median :1.000                                                                                                                                                  
-    ##  Mean   :1.356                                                                                                                                                  
+    ##  Mean   :1.328                                                                                                                                                  
     ##  3rd Qu.:2.000                                                                                                                                                  
     ##  Max.   :2.000                                                                                                                                                  
     ##  [Elaboro soluciones tecnológicas innovadoras para las problemáticas que he investigado en mi entorno.]
     ##  Min.   :0.000                                                                                         
     ##  1st Qu.:1.000                                                                                         
     ##  Median :1.000                                                                                         
-    ##  Mean   :1.059                                                                                         
-    ##  3rd Qu.:1.500                                                                                         
+    ##  Mean   :1.033                                                                                         
+    ##  3rd Qu.:1.000                                                                                         
     ##  Max.   :2.000                                                                                         
     ##  [Participo activamente en redes y comunidades de práctica, para la construcción colectiva de conocimientos con estudiantes y colegas con el apoyo de TIC.]
     ##  Min.   :0.000                                                                                                                                             
     ##  1st Qu.:1.000                                                                                                                                             
     ##  Median :1.000                                                                                                                                             
-    ##  Mean   :1.207                                                                                                                                             
+    ##  Mean   :1.139                                                                                                                                             
     ##  3rd Qu.:2.000                                                                                                                                             
     ##  Max.   :2.000                                                                                                                                             
     ##  [Participo en procesos de formación en mi área y/o disciplina utilizando TIC]
     ##  Min.   :0.000                                                                
     ##  1st Qu.:1.000                                                                
     ##  Median :2.000                                                                
-    ##  Mean   :1.526                                                                
+    ##  Mean   :1.489                                                                
     ##  3rd Qu.:2.000                                                                
     ##  Max.   :2.000                                                                
     ##  [Incentivo en mis estudiantes el aprendizaje autónomo y colaborativo apoyados por TIC.]
     ##  Min.   :0.000                                                                          
     ##  1st Qu.:1.000                                                                          
     ##  Median :2.000                                                                          
-    ##  Mean   :1.533                                                                          
+    ##  Mean   :1.539                                                                          
     ##  3rd Qu.:2.000                                                                          
     ##  Max.   :2.000                                                                          
     ##  [Hago seguimiento, retroalimentación y reconozco oportunidades de mejora de las implementaciones de estrategias que hacen uso de las TIC.]
-    ##  Min.   :0.00                                                                                                                              
-    ##  1st Qu.:1.00                                                                                                                              
-    ##  Median :1.00                                                                                                                              
-    ##  Mean   :1.37                                                                                                                              
-    ##  3rd Qu.:2.00                                                                                                                              
-    ##  Max.   :2.00                                                                                                                              
+    ##  Min.   :0.000                                                                                                                             
+    ##  1st Qu.:1.000                                                                                                                             
+    ##  Median :1.000                                                                                                                             
+    ##  Mean   :1.361                                                                                                                             
+    ##  3rd Qu.:2.000                                                                                                                             
+    ##  Max.   :2.000                                                                                                                             
     ##  [Construyo planes curriculares o proyectos pedagógicos mediados por las TIC de acuerdo con el desarrollo cognitivo, físico, psicológico y social de mis estudiantes.]
-    ##  Min.   :0.0                                                                                                                                                          
-    ##  1st Qu.:1.0                                                                                                                                                          
-    ##  Median :1.0                                                                                                                                                          
-    ##  Mean   :1.2                                                                                                                                                          
-    ##  3rd Qu.:2.0                                                                                                                                                          
-    ##  Max.   :2.0                                                                                                                                                          
+    ##  Min.   :0.000                                                                                                                                                        
+    ##  1st Qu.:1.000                                                                                                                                                        
+    ##  Median :1.000                                                                                                                                                        
+    ##  Mean   :1.211                                                                                                                                                        
+    ##  3rd Qu.:2.000                                                                                                                                                        
+    ##  Max.   :2.000                                                                                                                                                        
     ##  [Logro identificar las características, usos y oportunidades que ofrecen las herramientas teconológicas en los procesos educativos.]
     ##  Min.   :0.000                                                                                                                       
     ##  1st Qu.:1.000                                                                                                                       
     ##  Median :2.000                                                                                                                       
-    ##  Mean   :1.578                                                                                                                       
+    ##  Mean   :1.572                                                                                                                       
     ##  3rd Qu.:2.000                                                                                                                       
     ##  Max.   :2.000                                                                                                                       
     ##  [Utilizo diversas herramientas tecnológicas para mejorar la planeación y evaluación de mis prácticas educativas.]
     ##  Min.   :0.000                                                                                                    
     ##  1st Qu.:1.000                                                                                                    
     ##  Median :2.000                                                                                                    
-    ##  Mean   :1.526                                                                                                    
+    ##  Mean   :1.494                                                                                                    
     ##  3rd Qu.:2.000                                                                                                    
     ##  Max.   :2.000                                                                                                    
     ##  [Promuevo el uso de plataformas digitales y portales web dando énfasis a sus lógicas y características propias.]
     ##  Min.   :0.000                                                                                                   
     ##  1st Qu.:1.000                                                                                                   
     ##  Median :1.000                                                                                                   
-    ##  Mean   :1.356                                                                                                   
+    ##  Mean   :1.317                                                                                                   
     ##  3rd Qu.:2.000                                                                                                   
     ##  Max.   :2.000                                                                                                   
     ##  [Diseño y publico recursos educativos u objetivos virtuales de aprendizaje en plataformas digitales.]
     ##  Min.   :0.0000                                                                                       
     ##  1st Qu.:0.0000                                                                                       
     ##  Median :1.0000                                                                                       
-    ##  Mean   :0.9111                                                                                       
+    ##  Mean   :0.8333                                                                                       
     ##  3rd Qu.:1.0000                                                                                       
     ##  Max.   :2.0000                                                                                       
     ##  [Diseño ambientes de aprendizaje haciendo uso de lenguajes, interfaces y otras herramientas tecnológicas.]
     ##  Min.   :0.0000                                                                                            
     ##  1st Qu.:0.0000                                                                                            
     ##  Median :1.0000                                                                                            
-    ##  Mean   :0.8519                                                                                            
+    ##  Mean   :0.8056                                                                                            
     ##  3rd Qu.:1.0000                                                                                            
     ##  Max.   :2.0000
 
@@ -602,15 +607,15 @@ data_v2$Comp_Diseño = data_v2$`[Elaboro soluciones tecnológicas innovadoras pa
 summary(data_v2[ ,(length(colnames(data_v2))-3):(length(colnames(data_v2)))])
 ```
 
-    ##  Comp_Investigativa Comp_Pedagogica Comp_Tecnologica  Comp_Diseño   
-    ##  Min.   : 0.000     Min.   :0.00    Min.   : 1.000   Min.   : 0.00  
-    ##  1st Qu.: 5.000     1st Qu.:4.00    1st Qu.: 5.000   1st Qu.: 3.00  
-    ##  Median : 7.000     Median :6.00    Median : 6.000   Median : 5.00  
-    ##  Mean   : 6.607     Mean   :5.63    Mean   : 6.222   Mean   : 5.23  
-    ##  3rd Qu.: 9.000     3rd Qu.:7.00    3rd Qu.: 8.000   3rd Qu.: 7.00  
-    ##  Max.   :10.000     Max.   :8.00    Max.   :10.000   Max.   :10.00
+    ##  Comp_Investigativa Comp_Pedagogica Comp_Tecnologica  Comp_Diseño    
+    ##  Min.   : 0.000     Min.   :0.0     Min.   : 1.000   Min.   : 0.000  
+    ##  1st Qu.: 5.000     1st Qu.:4.0     1st Qu.: 4.000   1st Qu.: 3.000  
+    ##  Median : 7.000     Median :6.0     Median : 6.000   Median : 5.000  
+    ##  Mean   : 6.494     Mean   :5.6     Mean   : 6.022   Mean   : 5.022  
+    ##  3rd Qu.: 8.250     3rd Qu.:7.0     3rd Qu.: 8.000   3rd Qu.: 7.000  
+    ##  Max.   :10.000     Max.   :8.0     Max.   :10.000   Max.   :10.000
 
-## Estandarización de datos
+## Escalamiento de datos
 
 ``` r
 data_v2$Re_Comp_Investigativa = rescale(data_v2$Comp_Investigativa)
@@ -621,13 +626,13 @@ data_v2$Re_Comp_Diseño = rescale(data_v2$Comp_Diseño)
 summary(data_v2[ ,(length(colnames(data_v2))-3):(length(colnames(data_v2)))])
 ```
 
-    ##  Re_Comp_Investigativa Re_Comp_Pedagogica Re_Comp_Tecnologica Re_Comp_Diseño 
-    ##  Min.   :0.0000        Min.   :0.0000     Min.   :0.0000      Min.   :0.000  
-    ##  1st Qu.:0.5000        1st Qu.:0.5000     1st Qu.:0.4444      1st Qu.:0.300  
-    ##  Median :0.7000        Median :0.7500     Median :0.5556      Median :0.500  
-    ##  Mean   :0.6607        Mean   :0.7037     Mean   :0.5802      Mean   :0.523  
-    ##  3rd Qu.:0.9000        3rd Qu.:0.8750     3rd Qu.:0.7778      3rd Qu.:0.700  
-    ##  Max.   :1.0000        Max.   :1.0000     Max.   :1.0000      Max.   :1.000
+    ##  Re_Comp_Investigativa Re_Comp_Pedagogica Re_Comp_Tecnologica Re_Comp_Diseño  
+    ##  Min.   :0.0000        Min.   :0.000      Min.   :0.0000      Min.   :0.0000  
+    ##  1st Qu.:0.5000        1st Qu.:0.500      1st Qu.:0.3333      1st Qu.:0.3000  
+    ##  Median :0.7000        Median :0.750      Median :0.5556      Median :0.5000  
+    ##  Mean   :0.6494        Mean   :0.700      Mean   :0.5580      Mean   :0.5022  
+    ##  3rd Qu.:0.8250        3rd Qu.:0.875      3rd Qu.:0.7778      3rd Qu.:0.7000  
+    ##  Max.   :1.0000        Max.   :1.000      Max.   :1.0000      Max.   :1.0000
 
 ## Exploración de competencias
 

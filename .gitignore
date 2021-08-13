@@ -1,6 +1,9 @@
 .httr-oauth*
-.Rproj
+*.Rproj
 .user
 *.Rmd
 *.R
 .Rproj.user
+.httr-oauth-SUSPENDED
+.RData
+.Rhistory

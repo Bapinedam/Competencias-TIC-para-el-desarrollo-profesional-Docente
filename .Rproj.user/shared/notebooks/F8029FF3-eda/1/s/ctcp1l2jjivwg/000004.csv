@@ -1,6 +1,0 @@
-"0","data_edad_sexo = data %>% select(Sexo, `Edad (en aÃ±os)`) %>% filter(Sexo != ""Prefiero no decirlo"")"
-"2","Adding missing grouping variables: `Número de identificación`
-"
-"0","ggplot(data = data_edad_sexo, aes(x = Sexo, y = `Edad (en aÃ±os)`, fill = Sexo)) +"
-"0","  geom_boxplot(alpha=0.7, width=.4) + "
-"0","  theme_bw()"
